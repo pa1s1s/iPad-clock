@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="桌面看板">
+<title>桌面看板 · 时钟 天气 相册</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;background:#000;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+#photoLayer{position:fixed;left:0;top:0;width:100%;height:100%;z-index:0;}
+.photo{position:fixed;left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.8s ease-in-out;z-index:0;}
+.photo.show{opacity:1;}
+#shade{position:fixed;left:0;top:0;width:100%;height:100%;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0.30) 45%,rgba(0,0,0,0.62) 100%);}
+#weatherBox{position:fixed;left:4vw;top:4vh;z-index:3;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC','Microsoft YaHei',sans-serif;text-shadow:0 1px 8px rgba(0,0,0,0.6);}
+#wCity{font-size:2.6vw;font-weight:600;letter-spacing:0.08em;}
+#wMain{font-size:4.4vw;font-weight:600;margin-top:0.6vh;}
+#wSub{font-size:2.2vw;opacity:0.92;margin-top:0.4vh;}
+#clockArea{position:fixed;top:36%;left:0;width:100%;z-index:3;text-align:center;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC',sans-serif;text-shadow:0 2px 16px rgba(0,0,0,0.7);}
+#dateLine{font-size:3.2vw;font-weight:500;letter-spacing:0.14em;margin-bottom:1.6vh;opacity:0.95;}
+#clockLine{font-size:26vw;font-weight:200;line-height:1;letter-spacing:0.02em;display:block;}
+#clockLine span{display:inline-block;width:0.58em;text-align:center;font-weight:200;}
+#secLine{font-size:5vw;font-weight:300;margin-top:1vh;letter-spacing:0.12em;opacity:0.92;}
+#hint{position:fixed;right:3vw;bottom:2.5vh;z-index:3;color:rgba(255,255,255,0.62);font-size:2vw;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;text-shadow:0 1px 6px rgba(0,0,0,0.6);}
+#offline{position:fixed;left:4vw;bottom:2.5vh;z-index:3;color:rgba(255,255,255,0.55);font-size:2vw;font-family:sans-serif;display:none;}
+</style>
+</head>
+<body>
+<div id="photoLayer"></div>
+<div id="shade"></div>
+<div id="weatherBox">
+  <div id="wCity">邵阳</div>
+  <div id="wMain">--°</div>
+  <div id="wSub">天气加载中…</div>
+</div>
+<div id="clockArea">
+  <div id="dateLine"></div>
+  <div id="clockLine"><span id="c1"></span><span id="c2"></span><span id="cc"></span><span id="c3"></span><span id="c4"></span></div>
+  <div id="secLine"></div>
+</div>
+<div id="hint">轻点屏幕：暂停 / 继续照片</div>
+
+<script>
+/* ============================================================
+ * 桌面看板 · 时钟 + 天气 + 相册
+ * 兼容 iOS 12 Safari（iPad Air 1 可用）
+ * 需要修改的只有下面“配置区”，其余不用动。
+ * ============================================================ */
+
+/* ---------- 配置区：按需修改 ---------- */
+var PHOTOS = [
+  'photos/01.jpg',
+  'photos/02.jpg',
+  'photos/03.jpg'
+];              /* 照片放在本文件同目录的 photos 文件夹里，
+                   命名 01.jpg、02.jpg…，然后填进上面这个数组 */
+var PHOTO_INTERVAL = 10;   /* 照片切换间隔（秒） */
+var CITY = '邵阳';          /* 城市名（界面显示用） */
+var LAT = 27.24;           /* 纬度（邵阳≈27.24） */
+var LON = 111.47;          /* 经度（邵阳≈111.47） */
+var SHOW_SECONDS = true;   /* 是否显示秒 */
+var HOUR12 = false;        /* 是否 12 小时制 */
+/* ---------- 配置区结束 ---------- */
+
+var WEEK = ['日','一','二','三','四','五','六'];
+var WMO = [
+  [0,'晴','☀️'],[1,'多云','🌤️'],[2,'多云','🌤️'],[3,'阴','☁️'],
+  [45,'雾','🌫️'],[48,'雾','🌫️'],
+  [51,'毛毛雨','🌦️'],[53,'毛毛雨','🌦️'],[55,'毛毛雨','🌦️'],[56,'冻雨','🌧️'],[57,'冻雨','🌧️'],
+  [61,'小雨','🌧️'],[63,'中雨','🌧️'],[65,'大雨','🌧️'],[66,'冻雨','🌧️'],[67,'冻雨','🌧️'],
+  [71,'小雪','🌨️'],[73,'中雪','🌨️'],[75,'大雪','❄️'],[77,'雪粒','🌨️'],
+  [80,'阵雨','🌦️'],[81,'阵雨','🌧️'],[82,'强阵雨','⛈️'],
+  [85,'阵雪','🌨️'],[86,'强阵雪','❄️'],
+  [95,'雷阵雨','⛈️'],[96,'雷阵雨伴冰雹','⛈️'],[99,'雷阵雨伴冰雹','⛈️']
+];
+
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+/* ---------- 时钟 ---------- */
+var c1=document.getElementById('c1'), c2=document.getElementById('c2'),
+    cc=document.getElementById('cc'), c3=document.getElementById('c3'),
+    c4=document.getElementById('c4');
+var secLine=document.getElementById('secLine'),
+    dateLine=document.getElementById('dateLine');
+
+function tick(){
+  var now=new Date();
+  var h=now.getHours();
+  if(HOUR12){ h=h%12; if(h===0){ h=12; } }
+  var hm=pad(h), mm=pad(now.getMinutes()), ss=pad(now.getSeconds());
+  c1.innerHTML=hm.charAt(0); c2.innerHTML=hm.charAt(1);
+  cc.innerHTML=':';
+  c3.innerHTML=mm.charAt(0); c4.innerHTML=mm.charAt(1);
+  secLine.innerHTML=SHOW_SECONDS ? ss : '';
+  dateLine.innerHTML=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 · 星期'+WEEK[now.getDay()];
+}
+setInterval(tick,1000);
+tick();
+
+/* ---------- 天气（Open-Meteo 免费接口，无需 Key） ---------- */
+var wCity=document.getElementById('wCity'),
+    wMain=document.getElementById('wMain'),
+    wSub=document.getElementById('wSub');
+wCity.innerHTML=CITY;
+
+function wmoText(code){
+  for(var i=0;i<WMO.length;i++){ if(WMO[i][0]===code){ return WMO[i]; } }
+  return [code,'未知','🌡️'];
+}
+
+function loadWeather(){
+  var url='https://api.open-meteo.com/v1/forecast?latitude='+LAT+'&longitude='+LON+'&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FShanghai&forecast_days=1';
+  try{
+    fetch(url).then(function(res){ return res.json(); }).then(function(data){
+      var cw=data.current_weather;
+      if(!cw){ throw new Error('no data'); }
+      var w=wmoText(cw.weathercode);
+      wMain.innerHTML=w[2]+' '+Math.round(cw.temperature)+'°';
+      wSub.innerHTML=w[1]+' · 最高 '+Math.round(data.daily.temperature_2m_max[0])+'° / 最低 '+Math.round(data.daily.temperature_2m_min[0])+'°';
+    }).catch(function(){
+      wMain.innerHTML='--°';
+      wSub.innerHTML='天气离线（请检查网络，或改用 https 托管方式打开）';
+    });
+  }catch(e){
+    wMain.innerHTML='--°';
+    wSub.innerHTML='此浏览器不支持天气';
+  }
+}
+loadWeather();
+setInterval(loadWeather, 30*60*1000);
+
+/* ---------- 相册轮播 ---------- */
+var photoLayer=document.getElementById('photoLayer');
+var photos=PHOTOS.slice();
+var pIdx=0;          /* 当前照片下标 */
+var pEls=[null,null];/* 两张交替的 img 层 */
+var pActive=0;       /* 当前显示的层 */
+var paused=false;
+var hint=document.getElementById('hint');
+
+function makeImg(src, done){
+  var im=new Image();
+  im.onload=function(){ done(im); };
+  im.onerror=function(){ done(null); };
+  im.src=src;
+  return im;
+}
+
+function showFirst(){
+  if(photos.length===0){ return; }
+  makeImg(photos[0], function(im){
+    if(!im){ return; }
+    im.className='photo show';
+    photoLayer.appendChild(im);
+    pEls[pActive]=im;
+  });
+}
+
+function nextPhoto(){
+  if(photos.length<2 || paused){ return; }
+  var ni=(pIdx+1)%photos.length;
+  makeImg(photos[ni], function(im){
+    if(!im){ return; }
+    pIdx=ni;
+    var old=pEls[pActive];
+    pActive=1-pActive;
+    im.className='photo';
+    photoLayer.appendChild(im);
+    setTimeout(function(){ im.className='photo show'; }, 50);
+    pEls[pActive]=im;
+    if(old && old.parentNode){
+      setTimeout(function(){ if(old.parentNode){ old.parentNode.removeChild(old); } }, 2200);
+    }
+  });
+}
+
+showFirst();
+setInterval(nextPhoto, PHOTO_INTERVAL*1000);
+
+document.addEventListener('click', function(){
+  paused=!paused;
+  hint.innerHTML=paused ? '照片已暂停 · 轻点屏幕继续' : '轻点屏幕：暂停 / 继续照片';
+});
+
+/* ============================================================
+ * 使用说明
+ * 1. 照片：在桌面看板同目录建 photos 文件夹，放入 01.jpg、02.jpg…
+ *    （支持 jpg/png，建议压到 2MB 以内、横图），再在上方配置区
+ *    的 PHOTOS 数组里列出文件名。
+ * 2. 上线：本文件必须通过网址打开（iPad 上直接打开本地文件
+ *    无法联网取天气）。推荐：
+ *    a) 局域网：电脑上运行 python -m http.server 8080，
+ *       iPad 访问 http://电脑IP:8080/desk-clock.html
+ *    b) 长期：上传到 GitHub Pages 等免费托管，得到 https 地址
+ * 3. 全屏：Safari 打开后点「分享 → 添加到主屏幕」，
+ *    从主屏幕图标打开即为全屏看板。
+ * 4. 锁定：连按三次 Home 键启动「引导式访问」，防误触。
+ * ============================================================ */
+</script>
+</body>
+</html>
