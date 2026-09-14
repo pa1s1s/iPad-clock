@@ -14,44 +14,44 @@ html,body{margin:0;padding:0;width:100%;height:100%;background:#0e1013;overflow:
 
 /* ---- 日历（公历 + 农历） ---- */
 #calArea{text-align:center;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC','Microsoft YaHei',sans-serif;}
-#solarLine{font-size:3.2vw;font-weight:600;letter-spacing:0.16em;text-shadow:0 2px 12px rgba(0,0,0,0.8);}
-#lunarLine{font-size:2.2vw;opacity:0.9;margin-top:0.6vh;letter-spacing:0.1em;text-shadow:0 1px 8px rgba(0,0,0,0.8);}
+#solarLine{font-size:2.6vw;font-weight:600;letter-spacing:0.16em;text-shadow:0 2px 12px rgba(0,0,0,0.8);}
+#lunarLine{font-size:1.8vw;opacity:0.9;margin-top:0.6vh;letter-spacing:0.1em;text-shadow:0 1px 8px rgba(0,0,0,0.8);}
 
 /* ---- 翻页时钟 ---- */
 #clockArea{margin-top:3vh;text-align:center;}
 #flipClock{display:flex;align-items:center;justify-content:center;}
-.fc{position:relative;width:17vw;height:24vw;margin:0 0.8vw;background:#23282e;border-radius:1.4vw;box-shadow:0 0.6vw 2.2vw rgba(0,0,0,0.55),inset 0 0 0 0.12vw rgba(255,255,255,0.06);}
+.fc{position:relative;width:19vw;height:26vw;margin:0 0.9vw;background:#23282e;border-radius:1.6vw;box-shadow:0 0.6vw 2.2vw rgba(0,0,0,0.55),inset 0 0 0 0.12vw rgba(255,255,255,0.06);}
 .fc-top,.fc-bottom{position:absolute;left:0;width:100%;height:50%;overflow:hidden;background:#23282e;}
-.fc-top{top:0;border-radius:1.4vw 1.4vw 0 0;}
-.fc-bottom{bottom:0;border-radius:0 0 1.4vw 1.4vw;}
-.fc-line{position:absolute;left:0;width:100%;height:0.14vw;top:50%;margin-top:-0.07vw;background:rgba(0,0,0,0.75);z-index:4;}
-.fc-num{position:absolute;left:0;width:100%;text-align:center;font-size:17vw;font-weight:700;line-height:24vw;color:#f4f5f6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;}
+.fc-top{top:0;border-radius:1.6vw 1.6vw 0 0;}
+.fc-bottom{bottom:0;border-radius:0 0 1.6vw 1.6vw;}
+.fc-line{position:absolute;left:0;width:100%;height:0.16vw;top:50%;margin-top:-0.08vw;background:rgba(0,0,0,0.75);z-index:4;}
+.fc-num{position:absolute;left:0;width:100%;text-align:center;font-size:20vw;font-weight:700;line-height:26vw;color:#f4f5f6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;}
 .fc-top .fc-num,.fc-ft .fc-num{top:0;}
 .fc-bottom .fc-num,.fc-fb .fc-num{top:-100%;}
-.fc-ft{position:absolute;top:0;left:0;width:100%;height:50%;overflow:hidden;background:#2b3138;border-radius:1.4vw 1.4vw 0 0;opacity:0;-webkit-transform-origin:bottom center;transform-origin:bottom center;-webkit-backface-visibility:hidden;backface-visibility:hidden;z-index:3;}
-.fc-fb{position:absolute;bottom:0;left:0;width:100%;height:50%;overflow:hidden;background:#1b1f24;border-radius:0 0 1.4vw 1.4vw;opacity:0;-webkit-transform-origin:top center;transform-origin:top center;-webkit-backface-visibility:hidden;backface-visibility:hidden;z-index:3;}
+.fc-ft{position:absolute;top:0;left:0;width:100%;height:50%;overflow:hidden;background:#2b3138;border-radius:1.6vw 1.6vw 0 0;opacity:0;-webkit-transform-origin:bottom center;transform-origin:bottom center;-webkit-backface-visibility:hidden;backface-visibility:hidden;z-index:3;}
+.fc-fb{position:absolute;bottom:0;left:0;width:100%;height:50%;overflow:hidden;background:#1b1f24;border-radius:0 0 1.6vw 1.6vw;opacity:0;-webkit-transform-origin:top center;transform-origin:top center;-webkit-backface-visibility:hidden;backface-visibility:hidden;z-index:3;}
 .fc.go .fc-ft{-webkit-animation:flipTop 0.42s ease-in forwards;animation:flipTop 0.42s ease-in forwards;}
 .fc.go .fc-fb{-webkit-animation:flipBottom 0.42s ease-out 0.42s forwards;animation:flipBottom 0.42s ease-out 0.42s forwards;}
 @-webkit-keyframes flipTop{0%{-webkit-transform:rotateX(0deg);opacity:1;}100%{-webkit-transform:rotateX(-90deg);opacity:0;}}
 @keyframes flipTop{0%{transform:rotateX(0deg);opacity:1;}100%{transform:rotateX(-90deg);opacity:0;}}
 @-webkit-keyframes flipBottom{0%{-webkit-transform:rotateX(90deg);opacity:0;}100%{-webkit-transform:rotateX(0deg);opacity:1;}}
 @keyframes flipBottom{0%{transform:rotateX(90deg);opacity:0;}100%{transform:rotateX(0deg);opacity:1;}}
-.fc-sep{width:3.6vw;margin:0 0.4vw;text-align:center;}
-.fc-sep i{display:block;width:1.5vw;height:1.5vw;border-radius:50%;background:#fff;margin:0 auto 3vw auto;box-shadow:0 0 0.6vw rgba(0,0,0,0.6);}
-#secLine{font-size:5vw;font-weight:300;margin-top:1.8vh;letter-spacing:0.14em;opacity:0.92;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;text-shadow:0 2px 10px rgba(0,0,0,0.7);}
+.fc-sep{width:4vw;margin:0 0.5vw;text-align:center;}
+.fc-sep i{display:block;width:1.7vw;height:1.7vw;border-radius:50%;background:#fff;margin:0 auto 3.4vw auto;box-shadow:0 0 0.6vw rgba(0,0,0,0.6);}
+#secLine{font-size:10vw;font-weight:300;margin-top:1.2vh;letter-spacing:0.14em;opacity:0.92;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;text-shadow:0 2px 10px rgba(0,0,0,0.7);}
 #countdownLine{font-size:2.6vw;margin-top:1.2vh;letter-spacing:0.08em;opacity:0.88;color:#ffd88a;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC',sans-serif;text-shadow:0 1px 8px rgba(0,0,0,0.7);}
 
 /* ---- 五天天气 ---- */
-#weatherArea{margin-top:3vh;text-align:center;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC','Microsoft YaHei',sans-serif;}
-.wcity{font-size:1.9vw;letter-spacing:0.08em;margin-bottom:0.8vh;opacity:0.95;}
+#weatherArea{margin-top:2.5vh;text-align:center;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC','Microsoft YaHei',sans-serif;}
+.wcity{font-size:2.1vw;letter-spacing:0.08em;margin-bottom:0.8vh;opacity:0.95;}
 #wCards{display:flex;align-items:stretch;justify-content:center;}
-.wday{width:15vw;margin:0 0.55vw;padding:0.8vw 0.4vw;text-align:center;background:rgba(255,255,255,0.05);border:0.06vw solid rgba(255,255,255,0.1);border-radius:0.9vw;}
-.wd-label{font-size:1.8vw;font-weight:600;opacity:0.95;}
-.wd-icon{font-size:3vw;margin:0.5vh 0;}
-.wd-desc{font-size:1.6vw;opacity:0.85;}
-.wd-temp{font-size:2.3vw;font-weight:700;margin-top:0.3vh;}
-.wd-hilo{font-size:1.5vw;opacity:0.7;margin-top:0.2vh;}
-.wd-detail{font-size:1.4vw;opacity:0.75;margin-top:0.35vh;line-height:1.35;}
+.wday{width:17vw;margin:0 0.6vw;padding:0.8vw 0.5vw;text-align:center;background:rgba(255,255,255,0.05);border:0.06vw solid rgba(255,255,255,0.1);border-radius:1vw;}
+.wd-label{font-size:2vw;font-weight:600;opacity:0.95;}
+.wd-icon{font-size:3.4vw;margin:0.5vh 0;}
+.wd-desc{font-size:1.8vw;opacity:0.85;}
+.wd-temp{font-size:2.7vw;font-weight:700;margin-top:0.3vh;}
+.wd-hilo{font-size:1.7vw;opacity:0.7;margin-top:0.2vh;}
+.wd-detail{font-size:1.6vw;opacity:0.75;margin-top:0.35vh;line-height:1.35;}
 </style>
 </head>
 <body>
