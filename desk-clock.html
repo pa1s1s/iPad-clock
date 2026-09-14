@@ -5,62 +5,89 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="桌面看板">
-<title>桌面看板 · 时钟 天气 相册</title>
+<meta name="apple-mobile-web-app-title" content="翻页时钟">
+<title>多功能翻页时钟 · 天气 · 农历日历</title>
 <style>
-html,body{margin:0;padding:0;width:100%;height:100%;background:#000;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
-#photoLayer{position:fixed;left:0;top:0;width:100%;height:100%;z-index:0;}
-.photo{position:fixed;left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.8s ease-in-out;z-index:0;}
-.photo.show{opacity:1;}
-#shade{position:fixed;left:0;top:0;width:100%;height:100%;z-index:1;background:linear-gradient(to bottom,rgba(0,0,0,0.18) 0%,rgba(0,0,0,0.30) 45%,rgba(0,0,0,0.62) 100%);}
-#weatherBox{position:fixed;left:4vw;top:4vh;z-index:3;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC','Microsoft YaHei',sans-serif;text-shadow:0 1px 8px rgba(0,0,0,0.6);}
-#wCity{font-size:2.6vw;font-weight:600;letter-spacing:0.08em;}
-#wMain{font-size:4.4vw;font-weight:600;margin-top:0.6vh;}
-#wSub{font-size:2.2vw;opacity:0.92;margin-top:0.4vh;}
-#clockArea{position:fixed;top:36%;left:0;width:100%;z-index:3;text-align:center;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC',sans-serif;text-shadow:0 2px 16px rgba(0,0,0,0.7);}
-#dateLine{font-size:3.2vw;font-weight:500;letter-spacing:0.14em;margin-bottom:1.6vh;opacity:0.95;}
-#clockLine{font-size:26vw;font-weight:200;line-height:1;letter-spacing:0.02em;display:block;}
-#clockLine span{display:inline-block;width:0.58em;text-align:center;font-weight:200;}
-#secLine{font-size:5vw;font-weight:300;margin-top:1vh;letter-spacing:0.12em;opacity:0.92;}
-#hint{position:fixed;right:3vw;bottom:2.5vh;z-index:3;color:rgba(255,255,255,0.62);font-size:2vw;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;text-shadow:0 1px 6px rgba(0,0,0,0.6);}
-#offline{position:fixed;left:4vw;bottom:2.5vh;z-index:3;color:rgba(255,255,255,0.55);font-size:2vw;font-family:sans-serif;display:none;}
+html,body{margin:0;padding:0;width:100%;height:100%;background:#0e1013;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+#bg{position:fixed;left:0;top:0;width:100%;height:100%;z-index:0;background:linear-gradient(to bottom,#14171c 0%,#0e1013 60%,#0a0c0f 100%);}
+#stage{position:fixed;left:0;top:0;width:100%;height:100%;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+
+/* ---- 日历（公历 + 农历） ---- */
+#calArea{text-align:center;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC','Microsoft YaHei',sans-serif;}
+#solarLine{font-size:3vw;font-weight:600;letter-spacing:0.16em;text-shadow:0 2px 12px rgba(0,0,0,0.8);}
+#lunarLine{font-size:2vw;opacity:0.9;margin-top:0.6vh;letter-spacing:0.1em;text-shadow:0 1px 8px rgba(0,0,0,0.8);}
+
+/* ---- 翻页时钟 ---- */
+#clockArea{margin-top:3.5vh;text-align:center;}
+#flipClock{display:flex;align-items:center;justify-content:center;}
+.fc{position:relative;width:15vw;height:21vw;margin:0 0.7vw;background:#23282e;border-radius:1.2vw;box-shadow:0 0.6vw 2vw rgba(0,0,0,0.55),inset 0 0 0 0.12vw rgba(255,255,255,0.06);}
+.fc-top,.fc-bottom{position:absolute;left:0;width:100%;height:50%;overflow:hidden;background:#23282e;}
+.fc-top{top:0;border-radius:1.2vw 1.2vw 0 0;}
+.fc-bottom{bottom:0;border-radius:0 0 1.2vw 1.2vw;}
+.fc-line{position:absolute;left:0;width:100%;height:0.12vw;top:50%;margin-top:-0.06vw;background:rgba(0,0,0,0.75);z-index:4;}
+.fc-num{position:absolute;left:0;width:100%;text-align:center;font-size:15vw;font-weight:700;line-height:21vw;color:#f4f5f6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;}
+.fc-top .fc-num,.fc-ft .fc-num{top:0;}
+.fc-bottom .fc-num,.fc-fb .fc-num{top:-100%;}
+.fc-ft{position:absolute;top:0;left:0;width:100%;height:50%;overflow:hidden;background:#2b3138;border-radius:1.2vw 1.2vw 0 0;opacity:0;-webkit-transform-origin:bottom center;transform-origin:bottom center;-webkit-backface-visibility:hidden;backface-visibility:hidden;z-index:3;}
+.fc-fb{position:absolute;bottom:0;left:0;width:100%;height:50%;overflow:hidden;background:#1b1f24;border-radius:0 0 1.2vw 1.2vw;opacity:0;-webkit-transform-origin:top center;transform-origin:top center;-webkit-backface-visibility:hidden;backface-visibility:hidden;z-index:3;}
+.fc.go .fc-ft{-webkit-animation:flipTop 0.28s ease-in forwards;animation:flipTop 0.28s ease-in forwards;}
+.fc.go .fc-fb{-webkit-animation:flipBottom 0.28s ease-out 0.28s forwards;animation:flipBottom 0.28s ease-out 0.28s forwards;}
+@-webkit-keyframes flipTop{0%{-webkit-transform:rotateX(0deg);opacity:1;}100%{-webkit-transform:rotateX(-90deg);opacity:0;}}
+@keyframes flipTop{0%{transform:rotateX(0deg);opacity:1;}100%{transform:rotateX(-90deg);opacity:0;}}
+@-webkit-keyframes flipBottom{0%{-webkit-transform:rotateX(90deg);opacity:0;}100%{-webkit-transform:rotateX(0deg);opacity:1;}}
+@keyframes flipBottom{0%{transform:rotateX(90deg);opacity:0;}100%{transform:rotateX(0deg);opacity:1;}}
+.fc-sep{width:3.2vw;margin:0 0.4vw;text-align:center;}
+.fc-sep i{display:block;width:1.3vw;height:1.3vw;border-radius:50%;background:#fff;margin:0 auto 2.6vw auto;box-shadow:0 0 0.6vw rgba(0,0,0,0.6);}
+#secLine{font-size:4.5vw;font-weight:300;margin-top:1.6vh;letter-spacing:0.14em;opacity:0.92;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;text-shadow:0 2px 10px rgba(0,0,0,0.7);}
+
+/* ---- 三天天气 ---- */
+#weatherArea{margin-top:4vh;display:flex;align-items:stretch;color:#fff;font-family:'Helvetica Neue',Helvetica,Arial,'PingFang SC','Microsoft YaHei',sans-serif;}
+.wcity{font-size:1.9vw;letter-spacing:0.08em;margin:0 0 0.8vh 0;text-align:center;opacity:0.95;}
+.wday{width:15.5vw;margin:0 0.8vw;padding:1vw 0.6vw;text-align:center;background:rgba(255,255,255,0.05);border:0.06vw solid rgba(255,255,255,0.1);border-radius:1vw;}
+.wd-label{font-size:1.8vw;font-weight:600;opacity:0.95;}
+.wd-icon{font-size:3.2vw;margin:0.6vh 0;}
+.wd-desc{font-size:1.7vw;opacity:0.85;}
+.wd-temp{font-size:2.4vw;font-weight:700;margin-top:0.4vh;}
+.wd-hilo{font-size:1.5vw;opacity:0.7;margin-top:0.3vh;}
 </style>
 </head>
 <body>
-<div id="photoLayer"></div>
-<div id="shade"></div>
-<div id="weatherBox">
-  <div id="wCity">邵阳</div>
-  <div id="wMain">--°</div>
-  <div id="wSub">天气加载中…</div>
+<div id="bg"></div>
+<div id="stage">
+  <div id="calArea">
+    <div id="solarLine"></div>
+    <div id="lunarLine"></div>
+  </div>
+  <div id="clockArea">
+    <div id="flipClock"></div>
+    <div id="secLine"></div>
+  </div>
+  <div id="weatherArea">
+    <div style="text-align:center;align-self:center;">
+      <div class="wcity" id="wCity">邵阳</div>
+      <div id="wCards" style="display:flex;"></div>
+    </div>
+  </div>
 </div>
-<div id="clockArea">
-  <div id="dateLine"></div>
-  <div id="clockLine"><span id="c1"></span><span id="c2"></span><span id="cc"></span><span id="c3"></span><span id="c4"></span></div>
-  <div id="secLine"></div>
-</div>
-<div id="hint">轻点屏幕：暂停 / 继续照片</div>
 
 <script>
 /* ============================================================
- * 桌面看板 · 时钟 + 天气 + 相册
+ * 多功能翻页时钟 · 翻页效果 + 秒 + 三天天气 + 公历/农历日历
  * 兼容 iOS 12 Safari（iPad Air 1 可用）
- * 需要修改的只有下面“配置区”，其余不用动。
+ * 单文件，无需任何服务器，直接部署到 GitHub Pages 即可
+ * 只需修改下面“配置区”，其余不用动。
  * ============================================================ */
 
 /* ---------- 配置区：按需修改 ---------- */
-var PHOTOS = [
-  'photos/01.jpg',
-  'photos/02.jpg',
-  'photos/03.jpg'
-];              /* 照片放在本文件同目录的 photos 文件夹里，
-                   命名 01.jpg、02.jpg…，然后填进上面这个数组 */
-var PHOTO_INTERVAL = 10;   /* 照片切换间隔（秒） */
 var CITY = '邵阳';          /* 城市名（界面显示用） */
 var LAT = 27.24;           /* 纬度（邵阳≈27.24） */
 var LON = 111.47;          /* 经度（邵阳≈111.47） */
 var SHOW_SECONDS = true;   /* 是否显示秒 */
 var HOUR12 = false;        /* 是否 12 小时制 */
+var WEATHER_DAYS = 3;      /* 天气预报显示天数 */
+var MOVE_ENABLED = true;   /* 防烧屏：整块内容周期性微移位置（建议保持 true） */
+var MOVE_INTERVAL = 120;   /* 移动间隔（秒） */
+var MOVE_RANGE = 16;       /* 移动幅度（像素） */
 /* ---------- 配置区结束 ---------- */
 
 var WEEK = ['日','一','二','三','四','五','六'];
@@ -76,126 +103,244 @@ var WMO = [
 ];
 
 function pad(n){ return (n < 10 ? '0' : '') + n; }
+function $(id){ return document.getElementById(id); }
 
-/* ---------- 时钟 ---------- */
-var c1=document.getElementById('c1'), c2=document.getElementById('c2'),
-    cc=document.getElementById('cc'), c3=document.getElementById('c3'),
-    c4=document.getElementById('c4');
-var secLine=document.getElementById('secLine'),
-    dateLine=document.getElementById('dateLine');
-
-function tick(){
-  var now=new Date();
-  var h=now.getHours();
-  if(HOUR12){ h=h%12; if(h===0){ h=12; } }
-  var hm=pad(h), mm=pad(now.getMinutes()), ss=pad(now.getSeconds());
-  c1.innerHTML=hm.charAt(0); c2.innerHTML=hm.charAt(1);
-  cc.innerHTML=':';
-  c3.innerHTML=mm.charAt(0); c4.innerHTML=mm.charAt(1);
-  secLine.innerHTML=SHOW_SECONDS ? ss : '';
-  dateLine.innerHTML=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 · 星期'+WEEK[now.getDay()];
+/* ============================================================
+ * 农历转换（数据：香港天文台 1900-2100，算法：公历转农历）
+ * ============================================================ */
+var lunarInfo = [
+0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
+0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,
+0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,
+0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
+0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,
+0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,
+0x0a2e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,
+0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,
+0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,
+0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,
+0x0d520
+];
+var nStr1 = ['日','一','二','三','四','五','六','七','八','九','十'];
+var nStr2 = ['初','十','廿','卅'];
+var nStr3 = ['正','二','三','四','五','六','七','八','九','十','冬','腊'];
+var Gan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var Zhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+function lLeapMonth(y){ return lunarInfo[y-1900] & 0xf; }
+function lLeapDays(y){ if(lLeapMonth(y)){ return (lunarInfo[y-1900] & 0x10000) ? 30 : 29; } return 0; }
+function lMonthDays(y,m){ return (m>12||m<1) ? -1 : ((lunarInfo[y-1900] & (0x10000>>m)) ? 30 : 29); }
+function lYearDays(y){ var i,sum=348; for(i=0x8000;i>0x8;i>>=1){ sum += (lunarInfo[y-1900] & i) ? 1 : 0; } return sum + lLeapDays(y); }
+function toChinaDay(d){
+  if(d===10){ return '初十'; }
+  if(d===20){ return '二十'; }
+  if(d===30){ return '三十'; }
+  return nStr2[Math.floor(d/10)] + nStr1[d%10];
 }
-setInterval(tick,1000);
-tick();
+function solar2lunar(y,m,d){
+  if(y<1900||y>2100){ return null; }
+  var objDate = new Date(y, m-1, d);
+  y = objDate.getFullYear(); m = objDate.getMonth()+1; d = objDate.getDate();
+  var offset = (Date.UTC(y, m-1, d) - Date.UTC(1900,0,31)) / 86400000;
+  var i, temp = 0;
+  for(i=1900; i<2101 && offset>0; i++){ temp = lYearDays(i); offset -= temp; }
+  if(offset < 0){ offset += temp; i--; }
+  var year = i;
+  var leap = lLeapMonth(year), isLeap = false;
+  for(i=1; i<13 && offset>0; i++){
+    if(leap>0 && i===(leap+1) && isLeap===false){ --i; isLeap=true; temp=lLeapDays(year); }
+    else { temp = lMonthDays(year, i); }
+    if(isLeap===true && i===(leap+1)){ isLeap=false; }
+    offset -= temp;
+  }
+  if(offset===0 && leap>0 && i===(leap+1)){
+    if(isLeap){ isLeap=false; } else { isLeap=true; --i; }
+  }
+  if(offset<0){ offset += temp; --i; }
+  var month = i, day = offset+1;
+  var monthCn = (isLeap ? '闰' : '') + nStr3[month-1] + '月';
+  var dayCn = toChinaDay(day);
+  var gzYear = Gan[(year-4)%10] + Zhi[(year-4)%12];
+  return { year:year, month:month, day:day, isLeap:isLeap, monthCn:monthCn, dayCn:dayCn, gzYear:gzYear };
+}
 
-/* ---------- 天气（Open-Meteo 免费接口，无需 Key） ---------- */
-var wCity=document.getElementById('wCity'),
-    wMain=document.getElementById('wMain'),
-    wSub=document.getElementById('wSub');
-wCity.innerHTML=CITY;
+/* ---------- 日历显示（公历 + 农历） ---------- */
+var solarLine = $('solarLine'), lunarLine = $('lunarLine');
+function renderCalendar(){
+  var now = new Date();
+  solarLine.innerHTML = now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日 · 星期' + WEEK[now.getDay()];
+  var l = solar2lunar(now.getFullYear(), now.getMonth()+1, now.getDate());
+  if(l){ lunarLine.innerHTML = '农历' + l.monthCn + l.dayCn + ' · ' + l.gzYear + '年'; }
+  else { lunarLine.innerHTML = ''; }
+}
 
+/* ---------- 翻页时钟 ---------- */
+var flipClock = $('flipClock');
+var fcH1, fcH2, sep, fcM1, fcM2, dots;
+function makeFlipCard(id){
+  var fc = document.createElement('div');
+  fc.className = 'fc';
+  fc.id = id;
+  fc.innerHTML =
+    '<div class="fc-top"><span class="fc-num"></span></div>' +
+    '<div class="fc-line"></div>' +
+    '<div class="fc-bottom"><span class="fc-num"></span></div>' +
+    '<div class="fc-ft"><span class="fc-num"></span></div>' +
+    '<div class="fc-fb"><span class="fc-num"></span></div>';
+  flipClock.appendChild(fc);
+  return fc;
+}
+function makeSep(){
+  var s = document.createElement('div');
+  s.className = 'fc-sep';
+  s.innerHTML = '<i></i><i></i>';
+  flipClock.appendChild(s);
+  return s;
+}
+fcH1 = makeFlipCard('fcH1');
+fcH2 = makeFlipCard('fcH2');
+sep = makeSep();
+fcM1 = makeFlipCard('fcM1');
+fcM2 = makeFlipCard('fcM2');
+dots = sep.getElementsByTagName('i');
+function initCard(fc, v){
+  fc.setAttribute('data-v', v);
+  fc.getElementsByClassName('fc-top')[0].getElementsByClassName('fc-num')[0].innerHTML = v;
+  fc.getElementsByClassName('fc-bottom')[0].getElementsByClassName('fc-num')[0].innerHTML = v;
+  fc.getElementsByClassName('fc-ft')[0].getElementsByClassName('fc-num')[0].innerHTML = v;
+  fc.getElementsByClassName('fc-fb')[0].getElementsByClassName('fc-num')[0].innerHTML = v;
+}
+function updateFlip(fc, newVal){
+  if(fc.getAttribute('data-v') === String(newVal)){ return; }
+  fc.setAttribute('data-v', newVal);
+  fc.getElementsByClassName('fc-ft')[0].getElementsByClassName('fc-num')[0].innerHTML = newVal;
+  fc.getElementsByClassName('fc-fb')[0].getElementsByClassName('fc-num')[0].innerHTML = newVal;
+  fc.className = 'fc';
+  void fc.offsetWidth;
+  fc.className = 'fc go';
+  var top = fc.getElementsByClassName('fc-top')[0].getElementsByClassName('fc-num')[0];
+  var bot = fc.getElementsByClassName('fc-bottom')[0].getElementsByClassName('fc-num')[0];
+  setTimeout(function(){
+    top.innerHTML = newVal;
+    bot.innerHTML = newVal;
+    fc.className = 'fc';
+  }, 600);
+}
+var secLine = $('secLine');
+var lastKey = '';
+function tick(){
+  var now = new Date();
+  var h = now.getHours();
+  if(HOUR12){ h = h % 12; if(h === 0){ h = 12; } }
+  var hm = pad(h), mm = pad(now.getMinutes()), ss = pad(now.getSeconds());
+  var key = hm + mm;
+  if(key !== lastKey){
+    lastKey = key;
+    updateFlip(fcH1, hm.charAt(0));
+    updateFlip(fcH2, hm.charAt(1));
+    updateFlip(fcM1, mm.charAt(0));
+    updateFlip(fcM2, mm.charAt(1));
+  }
+  secLine.innerHTML = SHOW_SECONDS ? ss : '';
+  var on = (ss % 2 === 0);
+  dots[0].style.opacity = on ? '1' : '0.15';
+  dots[1].style.opacity = on ? '1' : '0.15';
+}
+(function initClock(){
+  var now = new Date();
+  var h = now.getHours();
+  if(HOUR12){ h = h % 12; if(h === 0){ h = 12; } }
+  var hm = pad(h), mm = pad(now.getMinutes());
+  initCard(fcH1, hm.charAt(0));
+  initCard(fcH2, hm.charAt(1));
+  initCard(fcM1, mm.charAt(0));
+  initCard(fcM2, mm.charAt(1));
+  lastKey = hm + mm;
+})();
+setInterval(tick, 1000);
+
+/* ---------- 三天天气（Open-Meteo 免费接口） ---------- */
+$('wCity').innerHTML = CITY;
+var wCards = $('wCards');
 function wmoText(code){
-  for(var i=0;i<WMO.length;i++){ if(WMO[i][0]===code){ return WMO[i]; } }
+  for(var i=0; i<WMO.length; i++){ if(WMO[i][0] === code){ return WMO[i]; } }
   return [code,'未知','🌡️'];
 }
-
 function loadWeather(){
-  var url='https://api.open-meteo.com/v1/forecast?latitude='+LAT+'&longitude='+LON+'&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FShanghai&forecast_days=1';
+  var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON +
+            '&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Asia%2FShanghai&forecast_days=8';
   try{
     fetch(url).then(function(res){ return res.json(); }).then(function(data){
-      var cw=data.current_weather;
-      if(!cw){ throw new Error('no data'); }
-      var w=wmoText(cw.weathercode);
-      wMain.innerHTML=w[2]+' '+Math.round(cw.temperature)+'°';
-      wSub.innerHTML=w[1]+' · 最高 '+Math.round(data.daily.temperature_2m_max[0])+'° / 最低 '+Math.round(data.daily.temperature_2m_min[0])+'°';
+      if(!data || !data.daily){ throw new Error('no data'); }
+      var daily = data.daily;
+      var n = Math.min(WEATHER_DAYS, daily.weathercode.length);
+      var html = '';
+      var now = new Date();
+      for(var i=0; i<n; i++){
+        var d = new Date(now.getFullYear(), now.getMonth(), now.getDate()+i);
+        var w = wmoText(daily.weathercode[i]);
+        var label = (i===0) ? '今天' : ((i===1) ? '明天' : WEEK[d.getDay()]);
+        var temp;
+        if(i===0 && data.current_weather){
+          temp = Math.round(data.current_weather.temperature) + '°';
+        } else {
+          temp = Math.round(daily.temperature_2m_max[i]) + '°';
+        }
+        html += '<div class="wday">' +
+                '<div class="wd-label">' + label + '</div>' +
+                '<div class="wd-icon">' + w[2] + '</div>' +
+                '<div class="wd-desc">' + w[1] + '</div>' +
+                '<div class="wd-temp">' + temp + '</div>' +
+                '<div class="wd-hilo">' + Math.round(daily.temperature_2m_max[i]) + '° / ' + Math.round(daily.temperature_2m_min[i]) + '°</div>' +
+                '</div>';
+      }
+      wCards.innerHTML = html;
     }).catch(function(){
-      wMain.innerHTML='--°';
-      wSub.innerHTML='天气离线（请检查网络，或改用 https 托管方式打开）';
+      wCards.innerHTML = '<div style="color:rgba(255,255,255,0.6);font-size:1.8vw;">天气离线（请检查网络）</div>';
     });
   }catch(e){
-    wMain.innerHTML='--°';
-    wSub.innerHTML='此浏览器不支持天气';
+    wCards.innerHTML = '<div style="color:rgba(255,255,255,0.6);font-size:1.8vw;">此浏览器不支持天气</div>';
   }
 }
 loadWeather();
-setInterval(loadWeather, 30*60*1000);
+setInterval(loadWeather, 30 * 60 * 1000);
 
-/* ---------- 相册轮播 ---------- */
-var photoLayer=document.getElementById('photoLayer');
-var photos=PHOTOS.slice();
-var pIdx=0;          /* 当前照片下标 */
-var pEls=[null,null];/* 两张交替的 img 层 */
-var pActive=0;       /* 当前显示的层 */
-var paused=false;
-var hint=document.getElementById('hint');
-
-function makeImg(src, done){
-  var im=new Image();
-  im.onload=function(){ done(im); };
-  im.onerror=function(){ done(null); };
-  im.src=src;
-  return im;
+/* ---------- 防烧屏：整块内容周期性微移 ---------- */
+var stage = $('stage');
+if(MOVE_ENABLED){
+  var moves = [[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+  var mi = 0;
+  stage.style.transition = 'transform 2.5s ease-in-out';
+  function doMove(){
+    mi = (mi + 1) % moves.length;
+    stage.style.transform = 'translate(' + (moves[mi][0] * MOVE_RANGE) + 'px,' + (moves[mi][1] * MOVE_RANGE) + 'px)';
+  }
+  setInterval(doMove, MOVE_INTERVAL * 1000);
 }
 
-function showFirst(){
-  if(photos.length===0){ return; }
-  makeImg(photos[0], function(im){
-    if(!im){ return; }
-    im.className='photo show';
-    photoLayer.appendChild(im);
-    pEls[pActive]=im;
-  });
-}
-
-function nextPhoto(){
-  if(photos.length<2 || paused){ return; }
-  var ni=(pIdx+1)%photos.length;
-  makeImg(photos[ni], function(im){
-    if(!im){ return; }
-    pIdx=ni;
-    var old=pEls[pActive];
-    pActive=1-pActive;
-    im.className='photo';
-    photoLayer.appendChild(im);
-    setTimeout(function(){ im.className='photo show'; }, 50);
-    pEls[pActive]=im;
-    if(old && old.parentNode){
-      setTimeout(function(){ if(old.parentNode){ old.parentNode.removeChild(old); } }, 2200);
-    }
-  });
-}
-
-showFirst();
-setInterval(nextPhoto, PHOTO_INTERVAL*1000);
-
-document.addEventListener('click', function(){
-  paused=!paused;
-  hint.innerHTML=paused ? '照片已暂停 · 轻点屏幕继续' : '轻点屏幕：暂停 / 继续照片';
-});
+/* ---------- 启动 ---------- */
+renderCalendar();
+setInterval(renderCalendar, 60000);
+tick();
 
 /* ============================================================
  * 使用说明
- * 1. 照片：在桌面看板同目录建 photos 文件夹，放入 01.jpg、02.jpg…
- *    （支持 jpg/png，建议压到 2MB 以内、横图），再在上方配置区
- *    的 PHOTOS 数组里列出文件名。
- * 2. 上线：本文件必须通过网址打开（iPad 上直接打开本地文件
- *    无法联网取天气）。推荐：
- *    a) 局域网：电脑上运行 python -m http.server 8080，
- *       iPad 访问 http://电脑IP:8080/desk-clock.html
- *    b) 长期：上传到 GitHub Pages 等免费托管，得到 https 地址
- * 3. 全屏：Safari 打开后点「分享 → 添加到主屏幕」，
- *    从主屏幕图标打开即为全屏看板。
- * 4. 锁定：连按三次 Home 键启动「引导式访问」，防误触。
+ * 1. 本文件是单文件看板，不依赖任何服务器。
+ * 2. 部署 GitHub：Add file → Upload files → 上传本文件 → Commit；
+ *    Settings → Pages → 选 main/(root) → Save；
+ *    访问 https://用户名.github.io/仓库名/desk-clock.html
+ *    （想打开仓库地址直接显示，把本文件改名为 index.html 再上传）
+ * 3. 本地也可直接双击用浏览器打开（天气需联网）。
+ * 4. 修改城市：改上方配置区的 LAT / LON / CITY。
  * ============================================================ */
 </script>
 </body>
