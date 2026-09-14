@@ -317,7 +317,7 @@ function loadWeather(){
         var d = new Date(now.getFullYear(), now.getMonth(), now.getDate()+i);
         var w = wmoText(daily.weathercode[i]);
         var label = (i===0) ? '今天' : ((i===1) ? '明天' : WEEK[d.getDay()]);
-        var temp = (i===0 && cur) ? Math.round(cur.temperature) + '°' : Math.round(daily.temperature_2m_max[i]) + '°';
+        var temp = (i===0 && cur) ? Math.round(cur.temperature_2m) + '°' : Math.round(daily.temperature_2m_max[i]) + '°';
         var feels = (i===0 && cur) ? Math.round(cur.apparent_temperature) : Math.round(daily.apparent_temperature_max[i]);
         var pp = daily.precipitation_probability_max[i];
         var ppTxt = (pp === null || pp === undefined) ? '--' : Math.round(pp) + '%';
